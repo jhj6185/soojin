@@ -15,5 +15,5 @@ public interface ReplyMapper {
   public List<ReplyVO> getListWithPaging(
 		  @Param("cri") Criteria cri,
 		  @Param("bno") Long bno);
-  //할수있다ㅇㅇㅇㅇㅇㅇㅇ
+  //할수있다ㅇㅇㅇㅇㅇㅇㅇ123456
 }
