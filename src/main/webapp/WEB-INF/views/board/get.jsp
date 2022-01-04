@@ -92,6 +92,7 @@
 					</li>
 				</ul>
 			</div>
+			<div class="panel-footer"></div>
 		</div>
 		<!-- 댓글 panel 끝 -->
 
@@ -106,16 +107,19 @@
 						<h4 class="modal-title" id="myModalLabel">REPLY MODAL</h4>
 					</div>
 					<div class="modal-body">
-					<div class="form-group"><label>Reply</label>
-					<input class="form-control" name='reply' value="New Reply!!!!">
-					</div>
-					<!-- replyer, replyDate를 위한 div배치 -->
-					<div class="form-group"><label>Replyer</label>
-					<input class="form-control" name='replyer' value="New Reply!!!!">
-					</div>
-					<div class="form-group"><label>ReplyDate</label>
-					<input class="form-control" name='replyDate' value="New Reply!!!!">
-					</div>
+						<div class="form-group">
+							<label>Reply</label> <input class="form-control" name='reply'
+								value="New Reply!!!!">
+						</div>
+						<!-- replyer, replyDate를 위한 div배치 -->
+						<div class="form-group">
+							<label>Replyer</label> <input class="form-control" name='replyer'
+								value="New Reply!!!!">
+						</div>
+						<div class="form-group">
+							<label>ReplyDate</label> <input class="form-control"
+								name='replyDate' value="New Reply!!!!">
+						</div>
 					</div>
 					<div class="modal-footer">
 						<button type="button" id="modalModBtn" class="btn btn-info">Modify</button>
@@ -197,6 +201,44 @@
 						// 뀨엥뀨잉--------------[object Object] 로 출력됨
 						}); */
 
+						
+						//댓글의 페이지 번호 처리
+						var pageNum = 1;
+						var replyPageFooter = $(".panel-footer");
+						function showReplyPage(replyCnt) {
+							console.log("showReplyPage : " + replyCnt);
+							var endNum = Math.ceil(pageNum / 10.0) * 10;
+							var startNum = endNum - 9;
+							var prev = startNum != 1;
+							var next = false;
+							if (endNum * 10 >= replyCnt) {
+								endNum = Math.ceil(replyCnt / 10.0);
+							}
+							if (endNum * 10 < replyCnt) {
+								next = true;
+							}
+							var str = "<ul class='pagination pull-right'>";
+
+								if (prev) {
+									str += "<li class='page-item'><a class='page-link' href='"
+											+ (startNum - 1)
+											+ "'>Previous</a></li>";
+								}
+								for (var i = startNum; i <= endNum; i++) {
+									var active = pageNum == i ? "active" : "";
+									str += "<li class='page-item "+active+"'><a class='page-link' href='"+i+"'>"
+											+ i + "</a></li>";
+								}
+								if (next) {
+									str += "<li class='page-item'><a class='page-link' href='"
+											+ (endNum + 1) + "'>Next</a></li>";
+								}
+								str += "</ul></div>";
+								console.log(str);
+								replyPageFooter.html(str);
+							} //showReplyPage
+						
+						
 						//댓글이벤트 처리
 						var replyUL = $(".chat");
 						showList(1);
@@ -208,7 +250,16 @@
 												bno : bnoValue,//bno와 page를 reply.js의 param으로 들어가게보냄
 												page : page || 1
 											},
-											function(list) {
+											function(replyCnt, list) {
+												console.log("replyCnt : "
+														+ replyCnt);
+												console.log("list : " + list);
+												if (page == 0) {
+													pageNum = Math
+															.ceil(replyCnt / 10.0);
+													showList(pageNum);
+													return;
+												}
 												var str = "";
 												if (list == null
 														|| list.length == 0) {
@@ -229,20 +280,23 @@
 															+ "</p><div></li>";
 												}
 												replyUL.html(str);
+												showReplyPage(replyCnt);
 											}); //function call
 						} //showList
-						
+
 						//댓글 작성 버튼 클릭시 모달 보이기
 						var modal = $(".modal");
 						var modalInputReply = modal.find("input[name='reply']");
-						var modalInputReplyer = modal.find("input[name='replyer']");
-						var modalInputReplyDate = modal.find("input[name='replyDate']");
-						
+						var modalInputReplyer = modal
+								.find("input[name='replyer']");
+						var modalInputReplyDate = modal
+								.find("input[name='replyDate']");
+
 						var modalModBtn = $("#modalModBtn");
 						var modalRemoveBtn = $("#modalRemoveBtn");
 						var modalRegisterBtn = $("#modalRegisterBtn");
-						
-						$("#addReplyBtn").on("click", function (e){
+
+						$("#addReplyBtn").on("click", function(e) {
 							modal.find("input").val("");
 							modalInputReplyDate.closest("div").hide();
 							modal.find("button[id!='modalCloseBtn']").hide(); //댓글작성 버튼 클릭시
@@ -250,62 +304,72 @@
 							modalRegisterBtn.show();
 							$(".modal").modal("show");
 						});
-						
+
 						//새로운 댓글 처리(새 댓글 추가 기능)
-						modalRegisterBtn.on("click", function(e){
-							var reply={
-									reply: modalInputReply.val(),
-									replyer: modalInputReplyer.val(),
-									bno: bnoValue
+						modalRegisterBtn.on("click", function(e) {
+							var reply = {
+								reply : modalInputReply.val(),
+								replyer : modalInputReplyer.val(),
+								bno : bnoValue
 							};
-							replyService.add(reply, function(result){
+							replyService.add(reply, function(result) {
 								alert(result); //댓글 등록이 정상임을 팝업으로 알림
 								modal.find("input").val(""); //댓글 등록이 정상적으로 이뤄지면 내용을 지움
 								modal.modal("hide"); //모달 창 지움
-								showList(1);
+								showList(0); //새로운 댓글을 추가하면 page값을 0으로 전송하고, 댓글의 전체숫자를
+								//파악한 후에 페이지 이동
 							})
 						})
-						
+
 						// 특정 댓글의 클릭 이벤트
-						$(".chat").on("click","li",function(e){
-							modalInputReplyDate.closest("div").show(); //댓글 클릭할 때마다 replyDate를 무조건 보여주도록 설정
-							//댓글 작성 버튼을 누를때 replyDate를 hide 시켜놔서 댓작성 버튼 눌렀다가 댓글 버튼 누르면
-							// 날짜가 안보이는 이슈가 있었음
-							var rno=$(this).data("rno");
-							replyService.get(rno, function(reply){
-								modalInputReply.val(reply.reply);
-								modalInputReplyer.val(reply.replyer);
-								modalInputReplyDate.val(replyService.displayTime(reply.replyDate))
-								.attr("readonly","readonly");
-								modal.data("rno", reply.rno);
-								
-								modal.find("button[id!='modalCloseBtn']").hide();
-								modalModBtn.show();
-								modalRemoveBtn.show();
-								$(".modal").modal("show");
-							})
-						});
-						
+						$(".chat")
+								.on("click","li",
+								function(e) {
+									modalInputReplyDate.closest("div")
+											.show(); //댓글 클릭할 때마다 replyDate를 무조건 보여주도록 설정
+									//댓글 작성 버튼을 누를때 replyDate를 hide 시켜놔서 댓작성 버튼 눌렀다가 댓글 버튼 누르면
+									// 날짜가 안보이는 이슈가 있었음
+									var rno = $(this).data("rno");
+									replyService.get(
+										rno,
+										function(reply) {
+											modalInputReply.val(reply.reply);
+											modalInputReplyer.val(reply.replyer);
+											modalInputReplyDate
+													.val(replyService.displayTime(reply.replyDate))
+													.attr("readonly","readonly");
+											modal.data("rno",reply.rno);
+											modal.find("button[id!='modalCloseBtn']").hide();
+											modalModBtn.show();
+											modalRemoveBtn.show();
+											$(".modal").modal("show");
+										})
+									});
+
 						//댓글의 수정/삭제 처리 이벤트
-						modalModBtn.on("click", function(e){
-							var reply={rno:modal.data("rno"), reply:modalInputReply.val()};
-							replyService.update(reply, function(result){
+						modalModBtn.on("click", function(e) {
+							var reply = {
+								rno : modal.data("rno"),
+								reply : modalInputReply.val()
+							};
+							replyService.update(reply, function(result) {
 								alert(result);
 								modal.modal("hide");
 								showList(1);
 							});
 						});
-						
-						modalRemoveBtn.on("click", function(e){
-							var rno= modal.data("rno");
-							replyService.remove(rno, function(result){
+
+						modalRemoveBtn.on("click", function(e) {
+							var rno = modal.data("rno");
+							replyService.remove(rno, function(result) {
 								alert(result);
-							modal.modal("hide");
-							showList(1);
+								modal.modal("hide");
+								showList(1);
+							});
 						});
-						});
-						
-						
+
+					
+
 					});
 </script>
 

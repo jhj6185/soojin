@@ -67,5 +67,12 @@ public class ReplyMapperTest {
 		  //그리고 bnoArr에 담겨있는 0번째 값이 1L여서 1번글의 댓글이 쫘라락 불러와질거임
 		  replies.forEach(reply -> log.info(reply));
 	  }
+	  
+	  @Test //댓글 페이징 처리 테스트
+		public void testList2() {
+			Criteria cri = new Criteria(2,5); //2페이지를 5개씩 불러오기
+			List<ReplyVO> replies = mapper.getListWithPaging(cri,10L); //bno가 10번인 게시물의 댓글들을 페이징처리하여 불러오기
+			replies.forEach(reply -> log.info(reply));
+		}
 }
 

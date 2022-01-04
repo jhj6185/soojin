@@ -23,7 +23,8 @@ var replyService=(function(){
 		var page = param.page || 1;
 		$.getJSON("/replies/pages/"+bno+"/"+page+".json",
 			function(data){
-				if(callback){ callback(data); }//반환값이 list
+				if(callback){ callback(data.replyCnt, data.list); }//반환값이 list
+				// 게시글의 댓글 수와 페이지를 사용하도록 수정했음
 			}).fail(function(xhr, status, err){
 				if(error){ error(); }
 			});

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.conan.domain.BoardVO;
 import org.conan.domain.Criteria;
+import org.conan.domain.ReplyVO;
 import org.conan.persistence.BoardMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,4 +90,5 @@ public class BoardMapperTest {
 			List<BoardVO> list = mapper.getListWithPaging(cri);
 			list.forEach(board->log.info(board));
 		}
+		
 }

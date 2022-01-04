@@ -1,8 +1,7 @@
 package org.conan.controller;
 
-import java.util.List;
-
 import org.conan.domain.Criteria;
+import org.conan.domain.ReplyPageDTO;
 import org.conan.domain.ReplyVO;
 import org.conan.service.ReplyService;
 import org.springframework.http.HttpStatus;
@@ -40,11 +39,11 @@ public class ReplyController {
 	// 특정 게시물의 댓글 목록
 	@GetMapping(value = "/pages/{bno}/{page}", produces = { MediaType.APPLICATION_XML_VALUE,
 			MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<List<ReplyVO>> getList(@PathVariable("page") int page, @PathVariable("bno") Long bno) {
+	public ResponseEntity<ReplyPageDTO> getList(@PathVariable("page") int page, @PathVariable("bno") Long bno) {
 		log.info("getList....");
-		Criteria cri = new Criteria(page, 5);
+		Criteria cri = new Criteria(page, 10); //댓글을 한 페이지당 10개씩 보여줌
 		log.info("cri : " + cri);
-		return new ResponseEntity<>(service.getList(cri, bno), HttpStatus.OK);
+		return new ResponseEntity<> (service.getListPage(cri, bno), HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/{rno}", // 댓글의 조회

@@ -15,5 +15,6 @@ public interface ReplyMapper {
   public List<ReplyVO> getListWithPaging(
 		  @Param("cri") Criteria cri,
 		  @Param("bno") Long bno);
-  //할수있다ㅇㅇㅇㅇㅇㅇㅇ123456
+  
+  public int getCountByBno(Long bno); //댓글 페이징을 위한 숫자 파악
 }

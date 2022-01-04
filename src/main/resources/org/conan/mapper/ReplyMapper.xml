@@ -14,6 +14,10 @@
 		from tbl_reply
 		where bno=#{bno} limit #{cri.pageStart}, #{cri.amount}
 	</select>
+	
+	<select id="getCountByBno" resultType="int">
+	select count(*) from tbl_reply where bno=#{bno}
+	</select>
 	<delete id="delete">
 		delete from tbl_reply where rno=#{rno}
 	</delete>
