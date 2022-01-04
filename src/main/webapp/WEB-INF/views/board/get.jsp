@@ -268,6 +268,9 @@
 						
 						// 특정 댓글의 클릭 이벤트
 						$(".chat").on("click","li",function(e){
+							modalInputReplyDate.closest("div").show(); //댓글 클릭할 때마다 replyDate를 무조건 보여주도록 설정
+							//댓글 작성 버튼을 누를때 replyDate를 hide 시켜놔서 댓작성 버튼 눌렀다가 댓글 버튼 누르면
+							// 날짜가 안보이는 이슈가 있었음
 							var rno=$(this).data("rno");
 							replyService.get(rno, function(reply){
 								modalInputReply.val(reply.reply);
@@ -283,7 +286,7 @@
 							})
 						});
 						
-						//댓글의 수정/ 삭제 처리 이벤트
+						//댓글의 수정/삭제 처리 이벤트
 						modalModBtn.on("click", function(e){
 							var reply={rno:modal.data("rno"), reply:modalInputReply.val()};
 							replyService.update(reply, function(result){
