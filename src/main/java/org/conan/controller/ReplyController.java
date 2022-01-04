@@ -40,6 +40,10 @@ public class ReplyController {
 	@GetMapping(value = "/pages/{bno}/{page}", produces = { MediaType.APPLICATION_XML_VALUE,
 			MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<ReplyPageDTO> getList(@PathVariable("page") int page, @PathVariable("bno") Long bno) {
+		//반환타입을 알고싶다면? return을 봐봐 근데 ResponseEntity<>가 있지?
+		//그러면 public ResponseEntity의 <> 안에 ReplyPageDTO가 있지?
+		//이게 반환타입이얌 . 그니까 service.getListPage(cri,bno)도 반환타입이 ReplyPageDTO인거
+		//*****개꿀팁 : service.getListPage(cri,bno)에 마우스갖다대면 맨 첫번째 뜨는게 반환타입!
 		log.info("getList....");
 		Criteria cri = new Criteria(page, 10); //댓글을 한 페이지당 10개씩 보여줌
 		log.info("cri : " + cri);

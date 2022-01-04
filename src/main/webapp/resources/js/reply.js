@@ -19,6 +19,8 @@ var replyService=(function(){
 } // add
 
 	function getList(param, callback, error){  //param이 데이터
+	//replyController에 가서 getList 함수로 간다.
+	//그러면 거기서 return 되는 값이 여기로 들어오는것..
 		var bno = param.bno;
 		var page = param.page || 1;
 		$.getJSON("/replies/pages/"+bno+"/"+page+".json",

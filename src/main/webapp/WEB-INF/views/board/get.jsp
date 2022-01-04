@@ -205,7 +205,8 @@
 						//댓글의 페이지 번호 처리
 						var pageNum = 1;
 						var replyPageFooter = $(".panel-footer");
-						function showReplyPage(replyCnt) {
+						function showReplyPage(replyCnt) { //replyCnt는 reply.js에 가서 replyCnt를 callback해줘서
+							//replyCnt를 쓸수있다 -> 
 							console.log("showReplyPage : " + replyCnt);
 							var endNum = Math.ceil(pageNum / 10.0) * 10;
 							var startNum = endNum - 9;
@@ -238,50 +239,58 @@
 								replyPageFooter.html(str);
 							} //showReplyPage
 						
+							//페이지 번호 클릭 시 새로운 댓글 출력
+							replyPageFooter.on("click", "li a", function(e){
+								e.preventDefault();
+								console.log("page click");
+								var targetPageNum = $(this).attr("href");
+								console.log("targetPageNum : "+targetPageNum);
+								pageNum = targetPageNum;
+								showList(pageNum);//댓글 수정과 삭제시에도 댓글이 포함된 페이지로 이동하도록 수정
+							})
 						
 						//댓글이벤트 처리
 						var replyUL = $(".chat");
 						showList(1);
 						function showList(page) {
-							replyService
-									.getList(
-											//반환값이 list
-											{
-												bno : bnoValue,//bno와 page를 reply.js의 param으로 들어가게보냄
-												page : page || 1
-											},
-											function(replyCnt, list) {
-												console.log("replyCnt : "
-														+ replyCnt);
-												console.log("list : " + list);
-												if (page == 0) {
-													pageNum = Math
-															.ceil(replyCnt / 10.0);
-													showList(pageNum);
-													return;
-												}
-												var str = "";
-												if (list == null
-														|| list.length == 0) {
-													replyUL.html("");
-													return;
-												}
-												for (var i = 0, len = list.length || 0; i < len; i++) {
-													str += "<li class='left clearfix' data-rno='"+list[i].rno+"'>";
-													str += "<div><div class='header'><strong class='primary-font'>"
-															+ list[i].replyer
-															+ "</strong>";
-													str += "<small class='pull-right text-muted'>"
-															+ replyService
-																	.displayTime(list[i].replyDate)
-															+ "</small><div>";
-													str += "<p>"
-															+ list[i].reply
-															+ "</p><div></li>";
-												}
-												replyUL.html(str);
-												showReplyPage(replyCnt);
-											}); //function call
+							replyService.getList(
+							//반환값이 list
+							{
+								bno : bnoValue,//bno와 page를 reply.js의 param으로 들어가게보냄
+								page : page || 1
+							},
+							function(replyCnt, list) {
+								console.log("replyCnt : "
+										+ replyCnt);
+								console.log("list : " + list);
+								if (page == 0) {
+									pageNum = Math
+											.ceil(replyCnt / 10.0);
+									showList(pageNum);
+									return;
+								}
+								var str = "";
+								if (list == null
+										|| list.length == 0) {
+									replyUL.html("");
+									return;
+								}
+								for (var i = 0, len = list.length || 0; i < len; i++) {
+									str += "<li class='left clearfix' data-rno='"+list[i].rno+"'>";
+									str += "<div><div class='header'><strong class='primary-font'>"
+											+ list[i].replyer
+											+ "</strong>";
+									str += "<small class='pull-right text-muted'>"
+											+ replyService
+													.displayTime(list[i].replyDate)
+											+ "</small><div>";
+									str += "<p>"
+											+ list[i].reply
+											+ "</p><div></li>";
+								}
+								replyUL.html(str);
+								showReplyPage(replyCnt);
+							}); //function call
 						} //showList
 
 						//댓글 작성 버튼 클릭시 모달 보이기
@@ -367,7 +376,8 @@
 								showList(1);
 							});
 						});
-
+						
+						
 					
 
 					});
