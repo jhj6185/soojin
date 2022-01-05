@@ -28,9 +28,10 @@ public class ReplyController {
 
 	// 등록작업과 테스트
 	@PostMapping(value = "/new", consumes = "application/json", produces = { MediaType.TEXT_PLAIN_VALUE })
-	public ResponseEntity<String> create(@RequestBody ReplyVO vo) {
+	public ResponseEntity<String> create(@RequestBody ReplyVO vo) {//@RequestBody는 파라미터로 들어오는걸 ReplyVO형태로
+		//바꿔주는 역할을 한다
 		log.info("ReplyVO : " + vo); // replyer, reply, bno 필요
-		int insertCount = service.register(vo);
+		int insertCount = service.register(vo); //insert한 갯수(댓글)
 		log.info("Reply INSERT COUNT : " + insertCount);
 		return insertCount == 1 ? new ResponseEntity<>("success", HttpStatus.OK)
 				: new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
