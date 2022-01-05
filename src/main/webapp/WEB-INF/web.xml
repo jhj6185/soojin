@@ -45,7 +45,7 @@
      </filter-mapping>
      
      <multipart-config>
-     <location>c:\\upload</location>
+     <location>C:\\upload</location>
      <!-- 업로드 되는 파일 저장 공간 -->
      <max-file-size>20971520</max-file-size>
      <!-- 업로드 되는 파일의 최대 크기 -->
