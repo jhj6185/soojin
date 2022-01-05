@@ -25,7 +25,12 @@
 		updateDate=now()
 		where bno=#{bno}
 	</update>
-
+	<update id="updateReplyCnt">
+	update tbl_board
+	set replycnt = replycnt+#{amount}
+	where bno=#{bno}
+	</update>
+	
 	<insert id="insertSelectKey">
 		insert into tbl_board(title,content,writer)
 		values(#{title},#{content},#{writer})
