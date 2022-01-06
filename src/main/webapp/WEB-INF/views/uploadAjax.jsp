@@ -5,10 +5,33 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<style>
+.uploadResult{
+width: 100%;
+height: 50px;
+background-color: #ddd;
+}
+.uploadResult ul{
+display:flex;
+flex-flow: row;
+justify-content: center;
+align-items: center;
+}
+.uploadResult ul li{
+list-style: none;
+padding 10px;
+}
+.uploadResult ul li img{
+width: 20px;
+}
+</style>
 </head>
 <body>
 <div class="uploadDiv">
 <input type="file" name="uploadFile" multiple>
+</div>
+<div class="uploadResult">
+<ul></ul>
 </div>
 <button id="uploadBtn">Upload</button>
 </body>
@@ -16,6 +39,32 @@
 <script src="/resources/vendor/jquery/jquery.min.js"></script>
 <script>
 $(document).ready(function(){
+	var cloneObj=$(".uploadDiv").clone();
+	//업로드 전에<input type='file'>객체가 포함된 <div> 복사
+	
+	//업로드 된 이미지 처리
+	var uploadResult=$(".uploadResult ul");
+	
+	function showUploadedFile(uploadResultArr){
+		var str="";
+		//console.dir(uploadResultArr);
+		//일반 파일의 처리
+		$(uploadResultArr).each(function(i,obj){
+			if(!obj.image){//이미지 아님
+				var fileCallPath = encodeURIComponent(obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName);
+				str+="<li><a href='/download?fileName="+fileCallPath+"'><img src='/resources/images/attach.png'>"
+						+obj.fileName+"</a></li>"; 
+						//이미지 아닌거의 attach.png 아이콘 클릭시 다운로드됨
+			}else{// 이미지
+			/* str+="<li>"+obj.fileName+"</li>"; */
+			var fileCallPath =
+				encodeURIComponent(obj.uploadPath+"/s_"+obj.uuid+"_"+obj.fileName);
+			str+="<li><img src='/display?fileName="+fileCallPath+" '></li>";
+			}
+		});
+		uploadResult.append(str);
+	}//showUploadedFile
+	
 	//파일의 확장자나 크기 사전처리 - 정규식을 이용해서 파일 확장자 체크
 	var regex = new RegExp("(.*?)\.(exe|sh|zip|alz)$");
 	var maxSize = 5242880;
@@ -52,11 +101,19 @@ $(document).ready(function(){
 			contentType: false,
 			data: formData, //전달할 데이터
 			type : 'POST',
+			dataType : 'json',
 			success: function(result){
 				alert('Uploaded');
+				console.log(result);
+				showUploadedFile(result);//업로드 된 이미지 처리
+				$(".uploadDiv").html(cloneObj.html()); //미리 파일 업로드 전 input을 복사해놓은거를
+				//업로드가 성공적으로 완료되면 다시 html에 보여줌
+
 			}
 		}); //$.ajax
 	});
+	
+	
 	
 	
 })

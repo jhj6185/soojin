@@ -230,6 +230,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- 썸네일 기능 https://mvnrepository.com/artifact/net.coobird/thumbnailator -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.16</version>
+		</dependency>
+
 
 
 	</dependencies>
