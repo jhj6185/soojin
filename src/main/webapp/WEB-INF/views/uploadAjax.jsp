@@ -38,6 +38,10 @@ width: 20px;
 <!-- jQuery -->
 <script src="/resources/vendor/jquery/jquery.min.js"></script>
 <script>
+function showImage(fileCallPath){
+	alert(fileCallPath);
+}// <a>태그에서 직접 showImage() 호출할 수 있도록 document ready 외부에 선언
+
 $(document).ready(function(){
 	var cloneObj=$(".uploadDiv").clone();
 	//업로드 전에<input type='file'>객체가 포함된 <div> 복사
@@ -59,7 +63,11 @@ $(document).ready(function(){
 			/* str+="<li>"+obj.fileName+"</li>"; */
 			var fileCallPath =
 				encodeURIComponent(obj.uploadPath+"/s_"+obj.uuid+"_"+obj.fileName);
-			str+="<li><img src='/display?fileName="+fileCallPath+" '></li>";
+			//원본 이미지 보여주기
+			var originPath = obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName;
+			originPath=originPath.replace(new RegExp(/\\/g),"/");
+			str+="<li><a href=\"javascript:showImage(\'"+originPath+"\')\"><img src='/display?fileName="
+					+fileCallPath+" '></a></li>";
 			}
 		});
 		uploadResult.append(str);

@@ -163,10 +163,11 @@ public class UploadController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		log.info("resource : "+resource);
-		String resourceName= resource.getFilename();
+		String resourceName= resource.getFilename();//그냥 단순히 파일의 이름을 가져오는건데
+		//uuid로 upload파일에 저장되게 해놔서 uuid 포함된 이름이 가져와지는것
 		
 		//remove UUID
-		String resourceOriginalName= resourceName.substring(resourceName.indexOf("_")+1);
+		String resourceOriginalName= resourceName.substring(resourceName.indexOf("_")+1);//걍 숫자로 이어서 이름 지음
 		log.info("resourceOriginalName : "+resourceOriginalName);
 		HttpHeaders headers = new HttpHeaders();
 		try {
