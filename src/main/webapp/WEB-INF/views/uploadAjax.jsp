@@ -122,6 +122,9 @@ $(document).ready(function(){
 			//원본 이미지 보여주기
 			var originPath = obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName;
 			originPath=originPath.replace(new RegExp(/\\/g),"/");
+			// /~~/ 어쨌든 슬래시 안에있는거를 인식하는 표현식인데
+			// 여기엔 백슬래쉬\가 들어잇으므로 \로 끝나는거를 다 /로 바꿔주는데 끝에가 jpg, png 등
+			// g로 끝나는애들만 \를 /로 바꿔주겠다는거임
 			str+="<li><a href=\"javascript:showImage(\'"+originPath+"\')\"><img src='/display?fileName="
 					+fileCallPath+" '></a><span data-file=\'"+fileCallPath+"\' data-type='image'>x</span></li>";
 					
@@ -161,13 +164,15 @@ $(document).ready(function(){
 		}
 		console.log("files.length : "+files.length);
 		$.ajax({
-			url: '/uploadAjaxAction',
+			url: '/uploadAjaxAction', //컨트롤러 실행
 			processData: false, //전달할 데이터를 query string을 만들지 말 것
 			contentType: false,
-			data: formData, //전달할 데이터
+			data: formData, //전달할 데이터 (controller에 전달할 데이터(매개변수))
 			type : 'POST',
 			dataType : 'json',
-			success: function(result){
+			success: function(result){//컨트롤러가 실행된 다음에 return 값에 잇는 (list,Http.ok)에서 
+				//ok면 success니까 이 함수로 들어오는데 result값으로 들어오는 것은 list이다.
+				//list에 담겨잇는 모든 정보를 result에 담아서 보여준다.
 				alert('Uploaded');
 				console.log(result);
 				showUploadedFile(result);//업로드 된 이미지 처리

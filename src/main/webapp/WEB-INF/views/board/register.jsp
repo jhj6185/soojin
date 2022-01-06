@@ -61,14 +61,16 @@ color: white
 					<br>
 					<!-- 파일 등록을 위한 화면 처리 ㅅㅣ작-->
 					<div class="row">
-						<div class="col-lg-12">
+						<div class="col-lg-6">
 							<div class="panel panel-default">
 								<div class="panel-heading">File Attach</div>
 								<div class="panel-body">
 									<div class="form-group uploadDiv">
 										<input type="file" name="uploadFile" multiple>
+										<!-- 파일선택 버튼 -->
 									</div>
 									<div class="uploadResult">
+									<!-- 업로드시, 미리보기로 사진이 보일 공간, ul하나에 파일 하나씩 담김 -->
 										<ul></ul>
 									</div>
 								</div>

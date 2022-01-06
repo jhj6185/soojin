@@ -45,8 +45,9 @@ public class UploadController {
 	  private boolean checkImageType(File file) {//이미지 파일 여부의 판단
 	  try {
 	  String contentType =
-	  Files.probeContentType(file.toPath()); return
-	  contentType.startsWith("image"); }
+	  Files.probeContentType(file.toPath()); // pdf인지 img인지 파일의 확장자를 알려주는애
+	  return contentType.startsWith("image"); //contentType이라는 애가 image라는 단어로 시작하냐???
+	  }
 	  catch(IOException e) { e.printStackTrace();
 	  } return false; 
 	  //true 면 이미지파일인것 
@@ -113,7 +114,8 @@ public class UploadController {
 			File saveFile = new File(uploadPath, uploadFileName);//uuid를 이용해서 고유한 파일명 생성
 			
 			try {
-				multipartFile.transferTo(saveFile);
+				multipartFile.transferTo(saveFile); //saveFile은 파일명을 우리가 원하는 걸로 생성해준 빈 껍데기일뿐이고
+				//multipartFile에 들어잇는 내용을 saveFile이라는 껍데기에 넣어줘라(변환)
 				attachDTO.setUuid(uuid.toString());
 				attachDTO.setUploadPath(getFolder());
 			  //썸네일을 처리하는 단계
@@ -144,8 +146,8 @@ public class UploadController {
 		try {
 			HttpHeaders header = new HttpHeaders();
 			header.add("Content-Type", Files.probeContentType(file.toPath()));
-			//적당한 MIME 타입(미디어 타입)을 헤더에 추가함
-			result = new ResponseEntity<>(FileCopyUtils.copyToByteArray(file),
+			//적당한 MIME 타입(미디어 타입)을 헤더에 추가함 probeContentType은 파일의 확장자 알려주는애
+			result = new ResponseEntity<>(FileCopyUtils.copyToByteArray(file), //파일의 크기
 					header, HttpStatus.OK);
 		}catch(IOException e) {
 			e.printStackTrace();
@@ -154,11 +156,12 @@ public class UploadController {
 	}
 	
 	//첨부파일의 다운로드
-	@GetMapping(value="download", produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	@GetMapping(value="/download", produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@ResponseBody
 	public ResponseEntity<Resource> downloadFile(String fileName){
 		log.info("download file : "+fileName);
 		Resource resource = new FileSystemResource("c:/upload/"+fileName);
+		//fileName은 경로까지 다 포함된 name이다. 날짜폴더/파일이름
 		//ppt에선 urid도 나와잇는데 아님
 		if(resource.exists() == false) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -166,9 +169,12 @@ public class UploadController {
 		log.info("resource : "+resource);
 		String resourceName= resource.getFilename();//그냥 단순히 파일의 이름을 가져오는건데
 		//uuid로 upload파일에 저장되게 해놔서 uuid 포함된 이름이 가져와지는것
-		
+		//12345_5678
 		//remove UUID
 		String resourceOriginalName= resourceName.substring(resourceName.indexOf("_")+1);//걍 숫자로 이어서 이름 지음
+		//substring( '_' 를 기준으로 짤라주는것 like split())
+		// '_'의 인덱스번호+1부터 끝까지 가져와라
+		//String A.substring(int a) : string A의 a번째 문자부터 끝까지를 가져온다.
 		log.info("resourceOriginalName : "+resourceOriginalName);
 		HttpHeaders headers = new HttpHeaders();
 		try {
@@ -190,12 +196,14 @@ public class UploadController {
 		File file;
 		try {
 			file = new File("c:/upload/"+URLDecoder.decode(fileName,"UTF-8"));
-			file.delete();
+			file.delete();//썸네일 파일은 지워졌으나 경로는 file안에 남아잇음
 			if(type.equals("image")) {
 				String largeFileName = file.getAbsolutePath().replace("s_", "");
+				//file이 썸네일 경로를 가르키고있기 땜에 원본사진도 삭제해줘야하므로 replace로 썸네일 경로를
+				// 원본 사진 경로로 바꿔줌
 				log.info("largeFileName : "+largeFileName);
 				file = new File(largeFileName);
-				file.delete();
+				file.delete();//원본사진 삭제
 			}
 		}catch(UnsupportedEncodingException e) {
 			e.printStackTrace();
