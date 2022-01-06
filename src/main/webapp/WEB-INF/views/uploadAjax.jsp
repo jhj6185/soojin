@@ -24,6 +24,31 @@ padding 10px;
 .uploadResult ul li img{
 width: 20px;
 }
+/* 원본 이미지 보여주기 */
+.uploadResult ul li span{
+color: white
+}
+.bigPictureWrapper{
+position: absolute;
+display: none;
+justify-content: center;
+align-items: center;
+top: 0%;
+width: 100%;
+height: 100%;
+background-color: gray;
+z-index: 100;
+background: rgba(255,255,255,0.5);
+}
+.bigPicture{
+position: relative;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+.bigPicture img{
+width: 400px;
+}
 </style>
 </head>
 <body>
@@ -33,6 +58,11 @@ width: 20px;
 <div class="uploadResult">
 <ul></ul>
 </div>
+<!-- 원본이미지 보여주기 -->
+<div class="bigPictureWrapper">
+<div class="bigPicture"></div>
+</div>
+<!-- 원본이미지 보여주기 끝 -->
 <button id="uploadBtn">Upload</button>
 </body>
 <!-- jQuery -->
@@ -40,7 +70,19 @@ width: 20px;
 <script>
 function showImage(fileCallPath){
 	alert(fileCallPath);
+	//원본 이미지 보여주기
+	$(".bigPictureWrapper").css("display","flex").show();
+	$(".bigPicture").html("<img src='/display?fileName="+encodeURI(fileCallPath)+"'>")
+	.animate({width: '100%', height: '100%'}, 1000);
 }// <a>태그에서 직접 showImage() 호출할 수 있도록 document ready 외부에 선언
+
+//커진 화면 클릭시 닫히는 기능
+$(".bigPictureWrapper").on("click", function(e){
+	$(".bigPicture").animate({width: '0%', height: '0%'}, 1000);
+	setTimeout(function(){
+		$('.bigPictureWrapper').hide();
+	},1000);
+}) //bigPictureWrapper click
 
 $(document).ready(function(){
 	var cloneObj=$(".uploadDiv").clone();
