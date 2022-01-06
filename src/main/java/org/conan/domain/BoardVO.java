@@ -1,6 +1,7 @@
 package org.conan.domain;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 
@@ -13,4 +14,5 @@ public class BoardVO {
 	private Date regDate;
 	private Date updateDate;
 	private int replyCnt; //댓글 수
+	private List<BoardAttachVO> attachList; //여러개의 첨부파일을 가진다
 }

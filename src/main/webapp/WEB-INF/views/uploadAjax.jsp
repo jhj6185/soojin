@@ -70,7 +70,7 @@ width: 400px;
 <script>
 function showImage(fileCallPath){
 	alert(fileCallPath);
-	//원본 이미지 보여주기
+	//원본 이미지 보여주기(미리보기 사진 클릭시 사진확대)
 	$(".bigPictureWrapper").css("display","flex").show();
 	$(".bigPicture").html("<img src='/display?fileName="+encodeURI(fileCallPath)+"'>")
 	.animate({width: '100%', height: '100%'}, 1000);
@@ -83,6 +83,20 @@ $(".bigPictureWrapper").on("click", function(e){
 		$('.bigPictureWrapper').hide();
 	},1000);
 }) //bigPictureWrapper click
+
+//x표시 이벤트 처리
+$(".uploadResult").on("click","span",function(e){
+	var targetFile = $(this).data("file");
+	var type=$(this).data("type");
+	console.log(targetFile);
+	$.ajax({
+		url: '/deleteFile',
+		data: {fileName:targetFile, type:type},
+		dataType:'text',
+		type: 'post',
+		success: function(result){ alert(result); }
+	}); //$.ajax
+})
 
 $(document).ready(function(){
 	var cloneObj=$(".uploadDiv").clone();
@@ -98,10 +112,10 @@ $(document).ready(function(){
 		$(uploadResultArr).each(function(i,obj){
 			if(!obj.image){//이미지 아님
 				var fileCallPath = encodeURIComponent(obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName);
-				str+="<li><a href='/download?fileName="+fileCallPath+"'><img src='/resources/images/attach.png'>"
-						+obj.fileName+"</a></li>"; 
+				str+="<li><div><a href='/download?fileName="+fileCallPath+"'><img src='/resources/images/attach.png'>"
+						+obj.fileName+"</a><span data-file=\'"+fileCallPath+"\' data-type='file'>x</span></div></li>"; 
 						//이미지 아닌거의 attach.png 아이콘 클릭시 다운로드됨
-			}else{// 이미지
+			}else{// 이미지인 경우
 			/* str+="<li>"+obj.fileName+"</li>"; */
 			var fileCallPath =
 				encodeURIComponent(obj.uploadPath+"/s_"+obj.uuid+"_"+obj.fileName);
@@ -109,7 +123,8 @@ $(document).ready(function(){
 			var originPath = obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName;
 			originPath=originPath.replace(new RegExp(/\\/g),"/");
 			str+="<li><a href=\"javascript:showImage(\'"+originPath+"\')\"><img src='/display?fileName="
-					+fileCallPath+" '></a></li>";
+					+fileCallPath+" '></a><span data-file=\'"+fileCallPath+"\' data-type='image'>x</span></li>";
+					
 			}
 		});
 		uploadResult.append(str);
@@ -130,7 +145,7 @@ $(document).ready(function(){
 		}
 		return true;
 	}
-	
+	//upload버튼 클릭시
 	$("#uploadBtn").on("click", function(e){
 		var formData = new FormData();
 		var inputFile=$("input[name='uploadFile']");
