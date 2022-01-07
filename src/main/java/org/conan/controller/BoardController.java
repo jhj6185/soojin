@@ -1,9 +1,18 @@
 package org.conan.controller;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import org.conan.domain.BoardAttachVO;
 import org.conan.domain.BoardVO;
 import org.conan.domain.Criteria;
 import org.conan.domain.PageDTO;
 import org.conan.service.BoardService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.AllArgsConstructor;
@@ -22,6 +32,27 @@ import lombok.extern.log4j.Log4j;
 @AllArgsConstructor
 public class BoardController {
 	private BoardService service;
+	
+	//서버에 업로드 된 파일들을 삭제하기 위한 메소드
+	private void deleteFiles(List<BoardAttachVO> attachList) {
+		if(attachList == null|| attachList.size() == 0) { return; }
+		log.info("delete attach files............");
+		log.info(attachList);
+		attachList.forEach(attach->{
+			try {
+				Path file = Paths.get("c:/upload/"+attach.getUploadPath()+"/"+
+			attach.getUuid()+"_"+attach.getFileName());
+				Files.deleteIfExists(file);
+				if(Files.probeContentType(file).startsWith("image")) {
+					Path thumbNail = Paths.get("c:/upload/"+attach.getUploadPath()+
+							"/s_"+attach.getUuid()+"_"+attach.getFileName());
+					Files.delete(thumbNail);
+				}
+			}catch(Exception e) {
+				log.error("delete file error : "+e.getMessage());
+			}
+		});
+	}
 	
 	@GetMapping("/list")
 	public void list(Criteria cri, Model model) {
@@ -39,10 +70,10 @@ public class BoardController {
 		log.info("register : "+ board);
 		//데이터 수집 여부 확인
 		if(board.getAttachList() !=null) {
-			board.getAttachList().forEach(attach -> log.info(attach));
+			board.getAttachList().forEach(attach -> log.info("11111"+attach));
 		}
-		
-		  service.register(board); rttr.addFlashAttribute("result",board.getBno());
+		  service.register(board); 
+		  rttr.addFlashAttribute("result",board.getBno());
 		  //result로 번호 보내주기
 		 return "redirect:/board/list"; //redirect:를 하지 않는 경우, 새로고침시 도배
 	}
@@ -51,6 +82,11 @@ public class BoardController {
 	 * 사용하지 않아도 파라미터인 객체는 전달이 되지만, 좀 더 명시적으로 이름을 지정하기 위해 사용.
 	 * ModelAttribute("cri") Criteria cri  ==  model.addAttribute("cri", cri)
 	 */
+	
+	@GetMapping("/register")
+	   public void register() {
+
+	   }
 	
 	// 상세보기, 수정화면
 		@GetMapping({"/get", "/modify"})
@@ -86,11 +122,13 @@ public class BoardController {
 		@PostMapping("/remove")
 		public String remove(
 				@RequestParam("bno") Long bno,
-				Criteria cri,  //추가
+				@ModelAttribute ("cri") Criteria cri,  //추가
 				RedirectAttributes rttr) 
 		{
 			log.info("remove..." + bno);
+			List<BoardAttachVO> attachList = service.getAttachList(bno);
 			if (service.remove(bno)) {
+				deleteFiles(attachList);
 				rttr.addFlashAttribute("result", "success");
 			}
 			rttr.addAttribute("pageNum", cri.getPageNum());
@@ -100,10 +138,14 @@ public class BoardController {
 
 			return "redirect:/board/list";
 		}
-	@GetMapping("/register")
-	public void register() {
-
-	}
+		
+		//게시물 조회할 때 파일 관련 자료를 json데이터로 만들어서 화면에 전송
+		@GetMapping(value = "/getAttachList", produces = MediaType.APPLICATION_JSON_VALUE)
+		@ResponseBody
+		public ResponseEntity<List<BoardAttachVO>> getAttachList(Long bno){
+			log.info("getAttachList"+bno);
+			return new ResponseEntity<>(service.getAttachList(bno), HttpStatus.OK);
+		}
 	
 	
 }

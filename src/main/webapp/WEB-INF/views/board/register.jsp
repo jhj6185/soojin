@@ -101,6 +101,7 @@ color: white
 		/* e.preventDefault(); */
 		console.log("submit clicked");
 		var str="";
+		
 		$(".uploadResult ul li").each(function(i, obj){
 			var jobj = $(obj);
 			console.dir(jobj);
@@ -109,7 +110,8 @@ color: white
 			str+="<input type='hidden' name='attachList["+i+"].uploadPath' value='"+jobj.data("path")+"'>";
 			str+="<input type='hidden' name='attachList["+i+"].fileType' value='"+jobj.data("type")+"'>";
 		})
-		formObj.append(str); //.submit();
+		debugger;
+		formObj.append(str).submit();
 	}); //submit button event
 
 	var cloneObj=$(".uploadDiv").clone();
@@ -147,9 +149,9 @@ color: white
 			//하나만쓸때는 객체만()에 넣어준다
 			//uploadResultArr이 obj로 하나씩 들어감
 			//여기서 obj는 showUploadedFile(result)로 호출되서 들어오는데, result는 첨부한 파일의 리스트이다
-			if(!obj.image){//이미지 아님
+			if(!obj.fileType){//이미지 아님
 				var fileCallPath = encodeURIComponent(obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName);
-				str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename= '"+obj.fileName+"' data-type='"+obj.image+"'><div><span>"+obj.fileName+"</span>";
+				str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename= '"+obj.fileName+"' data-type='"+obj.fileType+"'><div><span>"+obj.fileName+"</span>";
 				str+="<button type='button' data-file=\'"+fileCallPath+"\' data-type='file' class='btn btn-warning btn-circle'><i class='fa fa-times'></i></button><br>";
 				str+="<img src='/resources/images/attach.png'></a>";
 				str+="</div></li>";
@@ -158,7 +160,7 @@ color: white
 			var fileCallPath =
 				encodeURIComponent(obj.uploadPath+"/s_"+obj.uuid+"_"+obj.fileName);
 
-			str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename='"+obj.fileName+"' data-type='"+obj.image+"'><div>";
+			str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename='"+obj.fileName+"' data-type='"+obj.fileType+"'><div>";
 			str+="<span>"+obj.fileName+"</span>";
 			str+="<button type='button' data-file=\'"+fileCallPath+"\' data-type='image' class='btn btn-warning btn-circle'> <i class='fa fa-times'></i></button>";
 			str+="<br><img src='/display?fileName="+fileCallPath+"'>";
@@ -187,6 +189,7 @@ color: white
 	//파일선택 클릭해서 파일 업로드하는게 바뀔때마다 파일업로드
 	$(document).on('change',"input[type='file']", function(e){
 	/* $("input[type='file']").change(function(e) { */
+		console.dir("왜안돼ㅡㅡㅡㅡㅡ");
 		var formData = new FormData();
 		var inputFile = $("input[name='uploadFile']");
 		var files = inputFile[0].files;
@@ -197,8 +200,7 @@ color: white
 				return false;
 			}
 			formData.append("uploadFile", files[i]);
-		}
-		
+		}//for문 end
 		$.ajax({
 			url: '/uploadAjaxAction',
 			processData: false, //전달할 데이터를 query string을 만들지 말 것
@@ -212,10 +214,9 @@ color: white
 				showUploadedFile(result);//업로드 된 이미지 처리
 				$(".uploadDiv").html(cloneObj.html()); //미리 파일 업로드 전 input을 복사해놓은거를
 				//업로드가 성공적으로 완료되면 다시 html에 보여줌
-
 			}
 		}); //$.ajax
-
-	})
+		
+	});
 </script>
 </html>

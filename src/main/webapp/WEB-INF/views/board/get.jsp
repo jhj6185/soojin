@@ -3,12 +3,58 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
+<head>
 <title>Get</title>
 <%@include file="../includes/header.jsp"%>
 
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <!-- 푸터에 있음 -->
+<style>
+.bigPictureWrapper{
+position: absolute;
+display: none;
+justify-content: center;
+align-items: center;
+top: 0%;
+width: 100%;
+height: 100%;
+background-color: gray;
+z-index: 100;
+background: rgba(255,255,255,0.5);
+}
+.bigPicture{
+position: relative;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+.bigPicture img{
+width: 400px;
+}
 
+.uploadResult{
+width: 100%;
+background-color: #ddd;
+}
+.uploadResult ul{
+display:flex;
+flex-flow: row;
+justify-content: center;
+align-items: center;
+}
+.uploadResult ul li{
+list-style: none;
+padding : 10px;
+}
+.uploadResult ul li img{
+width: 20px;
+}
+/* 원본 이미지 보여주기 */
+.uploadResult ul li span{
+color: white
+}
+</style>
+</head>
 <div id="page-wrapper">
 	<div class="row">
 		<div class="col-lg-12">
@@ -42,7 +88,15 @@
 						<label>Writer</label><input class="form-control" name="writer"
 							value='<c:out value="${board.writer}"/>' readonly="readonly">
 					</div>
-
+					<div class="uploadResult">
+					<!-- 업로드시, 미리보기로 사진이 보일 공간, ul하나에 파일 하나씩 담김 -->
+						<ul></ul>
+					</div>
+					<!-- 원본이미지 보여주기 -->
+					<div class="bigPictureWrapper">
+					<div class="bigPicture"></div>
+					</div>
+					<!-- 원본이미지 보여주기 끝 -->
 
 					<%-- <button data-oper="modify" class="btn btn-default" onclick="location.href='/board/modify?bno=<c:out value="${board.bno}"/>'">Modify</button>
 					<button data-oper="list" class="btn btn-default" onclick="location.href='/board/list'">List</button> --%>
@@ -377,8 +431,53 @@
 							});
 						});
 						
+						//첨부된 파일리스트 bno로 가져오기
+						var bno='<c:out value="${board.bno}"/>';
+						$.getJSON("/board/getAttachList", {bno: bno}, function(arr){
+							console.log(arr);
+								var str="";
+								$(arr).each(function(i,obj){//forEach문은 첫번째값이 index, 두번째값이 객체
+									console.dir("dkkk앙아아아ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ");
+									//하나만쓸때는 객체만()에 넣어준다
+									//uploadResultArr이 obj로 하나씩 들어감
+									//여기서 obj는 showUploadedFile(result)로 호출되서 들어오는데, result는 첨부한 파일의 리스트이다
+									if(!obj.fileType){//이미지 아님
+										var fileCallPath = encodeURIComponent(obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName);
+										str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename= '"+obj.fileName+"' data-type='"+obj.image+"'><div><span>"+obj.fileName+"</span>";
+										str+="<br>";
+										str+="<img src='/resources/images/attach.png'></a>";
+										str+="</div></li>";
+									}else{// 이미지인 경우
+									
+									var fileCallPath =
+										encodeURIComponent(obj.uploadPath+"/s_"+obj.uuid+"_"+obj.fileName);
+	
+									str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename='"+obj.fileName+"' data-type='"+obj.image+"'><div>";
+									str+="<span>"+obj.fileName+"</span>";
+									str+="<br><img src='/display?fileName="+fileCallPath+"'>";
+									/* str+="<br><img src='javascript:showImage(\'"+fileCallPath+"'>"; */
+									str+="</div></li>";
+									}
+							});
+							$(".uploadResult ul").html(str);
+						}); //end getJson
 						
-					
+						function showImage(fileCallPath){
+							alert(fileCallPath);
+							//원본 이미지 보여주기(미리보기 사진 클릭시 사진확대)
+							$(".bigPictureWrapper").css("display","flex").show();
+							$(".bigPicture").html("<img src='/display?fileName="+encodeURI(fileCallPath)+"'>")
+							.animate({width: '100%', height: '100%'}, 1000);
+						}// <a>태그에서 직접 showImage() 호출할 수 있도록 document ready 외부에 선언
+
+						//커진 화면 클릭시 닫히는 기능
+						$(".bigPictureWrapper").on("click", function(e){
+							$(".bigPicture").animate({width: '0%', height: '0%'}, 1000);
+							setTimeout(function(){
+								$('.bigPictureWrapper').hide();
+							},1000);
+						}) //bigPictureWrapper click
+						
 
 					});
 </script>

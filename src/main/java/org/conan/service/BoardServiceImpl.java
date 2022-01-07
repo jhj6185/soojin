@@ -2,6 +2,7 @@ package org.conan.service;
 
 import java.util.List;
 
+import org.conan.domain.BoardAttachVO;
 import org.conan.domain.BoardVO;
 import org.conan.domain.Criteria;
 import org.conan.mapper.BoardAttachMapper;
@@ -30,7 +31,7 @@ public class BoardServiceImpl implements BoardService {
 		if(board.getAttachList()==null || board.getAttachList().size()<=0) {
 			return;
 		}
-		
+		log.info("보드서비스임플 : "+board.getBno());
 		  board.getAttachList().forEach(attach->{ attach.setBno(board.getBno());
 		  attachMapper.insert(attach); });
 		 
@@ -41,16 +42,30 @@ public class BoardServiceImpl implements BoardService {
 		log.info("get...."+bno);
 		return mapper.read(bno);
 	}
-
+	
+	@Transactional
 	@Override
 	public boolean modify(BoardVO board) {
 		log.info("modify...."+board);
-		return mapper.update(board)==1;
+		attachMapper.deleteAll(board.getBno()); //db에서 모든 첨부파일 정보 삭제
+		boolean modifyResult = mapper.update(board)==1; //board 테이블 정보 수정
+		if(modifyResult && board.getAttachList()!= null&& board.getAttachList().size()>0) {
+			board.getAttachList().forEach(attach->{
+				attach.setBno(board.getBno());
+				attachMapper.insert(attach); //db에 첨부파일 정보 저장
+			});
+		}
+		//첨부파일은 수정이라는 개념 존재 x
+		//db에서 기존 파일 모두 삭제후 남아있던 목록의 파일들 추가 ->
+		// db 내용과 서버 업로드 폴더의 내용 불일치( 주기적으로 파일과 db비교하여 일치시키는 작업 추가)
+		return modifyResult;
 	}
-
+	
+	@Transactional
 	@Override
 	public boolean remove(Long bno) {
 		log.info("remove...."+bno);
+		attachMapper.deleteAll(bno); //첨부파일과 게시물이 같이 삭제되도록
 		return mapper.delete(bno)==1;
 	}
 
@@ -70,5 +85,11 @@ public class BoardServiceImpl implements BoardService {
 	public int getTotal(Criteria cri) {
 		log.info("get total count");
 		return mapper.getTotalCount(cri);
+	}
+	
+	@Override
+	public List<BoardAttachVO> getAttachList(Long bno){
+		log.info("get Attach list by bno"+bno);
+		return attachMapper.findByBno(bno);
 	}
 }

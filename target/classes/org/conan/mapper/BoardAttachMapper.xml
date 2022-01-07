@@ -8,8 +8,11 @@
    <delete id="delete">
       delete from tbl_attach where uuid=#{uuid}
    </delete>
+   <delete id="deleteAll">
+   	delete from tbl_attach where bno=#{bno}
+   </delete>
    <select id="findByBno" resultType="org.conan.domain.BoardAttachVO">
-      select * from tbl_board where
-      bno = #{bno}
+      select * from tbl_attach where bno = #{bno}
    </select>
+   
 </mapper>

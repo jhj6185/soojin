@@ -120,7 +120,7 @@ public class UploadController {
 				attachDTO.setUploadPath(getFolder());
 			  //썸네일을 처리하는 단계
 			  if(checkImageType(saveFile)) { //이미지 파일이면
-				  attachDTO.setImage(true);
+				  attachDTO.setFileType(true);
 			  FileOutputStream thumbnail = new FileOutputStream(new File(uploadPath,
 			  "s_"+uploadFileName)); //이미지 파일이면 s_를 붙여서 저장하도록 함.(이게 썸네일)
 			  Thumbnailator.createThumbnail(multipartFile.getInputStream(), thumbnail,

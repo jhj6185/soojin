@@ -8,5 +8,5 @@ public class BoardAttachVO {
 	private String uploadPath;
 	private String fileName;
 	private boolean fileType; //이미지 파일 여부
-	private Long bno;
+	private Long bno; //게시글의 bno
 }

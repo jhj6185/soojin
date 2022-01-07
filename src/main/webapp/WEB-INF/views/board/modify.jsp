@@ -4,11 +4,39 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE html>
 <html lang="en">
+<head>
+<style>
+.uploadResult {
+	width: 100%;
+	background-color: #ddd;
+}
+
+.uploadResult ul {
+	display: flex;
+	flex-flow: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.uploadResult ul li {
+	list-style: none;
+	padding: 10px;
+}
+
+.uploadResult ul li img {
+	width: 20px;
+}
+/* 원본 이미지 보여주기 */
+.uploadResult ul li span {
+	color: white
+}
+</style>
 <title>Modify</title>
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <!-- 푸터에 있음 -->
 <%@include file="../includes/header.jsp"%>
 <%@include file="../includes/footer.jsp"%>
+</head>
 <div id="page-wrapper">
 	<div class="row">
 		<div class="col-lg-12">
@@ -57,7 +85,15 @@
 								value='<fmt:formatDate value="${board.updateDate}" pattern="yyyy/MM/dd"/>'
 								readonly="readonly">
 						</div>
-
+						
+						<div class="form-group uploadDiv">
+							<input type="file" name="uploadFile" multiple>
+							<!-- 파일선택 버튼 -->
+						</div>
+						<div class="uploadResult">
+							<!-- 업로드시, 미리보기로 사진이 보일 공간, ul하나에 파일 하나씩 담김 -->
+							<ul></ul>
+						</div>
 
 						<button type="submit" data-oper="modify" class="btn btn-info">Modify</button>
 						<button type="submit" data-oper="remove" class="btn btn-danger">Remove</button>
@@ -79,7 +115,7 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		var formObj = $("form");
-		
+
 		$('button').on("click", function(e) {
 			e.preventDefault();
 			var operation = $(this).data("oper");
@@ -107,9 +143,165 @@
 				formObj.append(amountTag);
 				formObj.append(keywordTag);
 				formObj.append(typeTag);
-			}
+			} else if(operation === 'modify'){//게시판 수정 이벤트 처리
+				console.log('submit clicked');
+				var str="";
+				$(".uploadResult ul li").each(function(i,obj){
+					var jobj = $(obj);
+					console.dir(jobj);
+					str+="<input type='hidden' name='attachList["+i+"].fileName' value='"+jobj.data("filename")+"'>";
+					str+="<input type='hidden' name='attachList["+i+"].uuid' value='"+jobj.data("uuid")+"'>";
+					str+="<input type='hidden' name='attachList["+i+"].uploadPath' value='"+jobj.data("path")+"'>";
+					str+="<input type='hidden' name='attachList["+i+"].fileType' value='"+jobj.data("type")+"'>";
+				});
+				formObj.append(str);
+			}			
 			formObj.submit();
-		});
+		}); //button click end
+		
+		var cloneObj=$(".uploadDiv").clone();
+		//업로드 전에<input type='file'>객체가 포함된 <div> 복사
+		
+		//업로드 된 이미지 처리
+		var uploadResult=$(".uploadResult ul");
+		
+		//첨부파일의 변경 처리
+		$(".uploadResult").on("click","button",function(e){
+			var targetFile = $(this).data("file");
+			var type= $(this).data("type");
+			var targetLi = $(this).closest("li");
+			
+			if(confirm("이 파일을 삭제하시겠습니까? ")){
+				var targetLi = $(this).closest("li");
+				targetLi.remove();
+			}
+			
+			$.ajax({
+				url: '/deleteFile',
+				data : {fileName : targetFile, type : type},
+				dataType : 'text',
+				type: 'post',
+				success : function(result){
+					alert(result);
+					targetLi.remove();
+				}
+			}); //$.ajax
+		}); //uploadResult click event
+		
+		//첨부된 파일리스트 bno로 가져오기
+		var bno='<c:out value="${board.bno}"/>';
+		$.getJSON("/board/getAttachList", {bno: bno}, function(arr){
+			console.log(arr);
+				var str="";
+				$(arr).each(function(i,obj){//forEach문은 첫번째값이 index, 두번째값이 객체
+					//하나만쓸때는 객체만()에 넣어준다
+					//uploadResultArr이 obj로 하나씩 들어감
+					//여기서 obj는 showUploadedFile(result)로 호출되서 들어오는데, result는 첨부한 파일의 리스트이다
+					if(!obj.fileType){//이미지 아님
+						var fileCallPath = encodeURIComponent(obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName);
+						str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename= '"+obj.fileName+"' data-type='"+obj.image+"'><div><span>"+obj.fileName+"</span>";
+						str+="<button type='button' data-file=\'"+fileCallPath+"\' data-type='file' class='btn btn-warning btn-circle'><i class='fa fa-times'></i></button>";
+						str+="<br>";
+						str+="<img src='/resources/images/attach.png'></a>";
+						str+="</div></li>";
+					}else{// 이미지인 경우
+					
+					var fileCallPath =
+						encodeURIComponent(obj.uploadPath+"/s_"+obj.uuid+"_"+obj.fileName);
+
+					str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename='"+obj.fileName+"' data-type='"+obj.image+"'><div>";
+					str+="<span>"+obj.fileName+"</span>";
+					str+="<button type='button' data-file=\'"+fileCallPath+"\' data-type='image' class='btn btn-warning btn-circle'> <i class='fa fa-times'></i></button>";
+					str+="<br><img src='/display?fileName="+fileCallPath+"'>";
+					/* str+="<br><img src='javascript:showImage(\'"+fileCallPath+"'>"; */
+					str+="</div></li>";
+					}
+			});
+			$(".uploadResult ul").html(str);
+		}); //end getJson
+		
+		function showUploadedFile(uploadResultArr){
+			//업로드 된 결과를 화면에 썸네일 또는 아이콘으로 출력하기
+			if(!uploadResultArr|| uploadResultArr.length == 0){ return; }
+			var uploadUL = $(".uploadResult ul");
+			var str="";
+			//console.dir(uploadResultArr);
+			//일반 파일의 처리
+			$(uploadResultArr).each(function(i,obj){//forEach문은 첫번째값이 index, 두번째값이 객체
+				//하나만쓸때는 객체만()에 넣어준다
+				//uploadResultArr이 obj로 하나씩 들어감
+				//여기서 obj는 showUploadedFile(result)로 호출되서 들어오는데, result는 첨부한 파일의 리스트이다
+				if(!obj.fileType){//이미지 아님
+					var fileCallPath = encodeURIComponent(obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName);
+					str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename= '"+obj.fileName+"' data-type='"+obj.fileType+"'><div><span>"+obj.fileName+"</span>";
+					str+="<button type='button' data-file=\'"+fileCallPath+"\' data-type='file' class='btn btn-warning btn-circle'><i class='fa fa-times'></i></button><br>";
+					str+="<img src='/resources/images/attach.png'></a>";
+					str+="</div></li>";
+				}else{// 이미지인 경우
+				
+				var fileCallPath =
+					encodeURIComponent(obj.uploadPath+"/s_"+obj.uuid+"_"+obj.fileName);
+
+				str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename='"+obj.fileName+"' data-type='"+obj.fileType+"'><div>";
+				str+="<span>"+obj.fileName+"</span>";
+				str+="<button type='button' data-file=\'"+fileCallPath+"\' data-type='image' class='btn btn-warning btn-circle'> <i class='fa fa-times'></i></button>";
+				str+="<br><img src='/display?fileName="+fileCallPath+"'>";
+				str+="</div></li>";
+				}
+			});
+			$(".uploadResult ul").html(str);
+			//uploadUL.append(str);
+		}//showUploadedFile
+		
+		//파일의 확장자나 크기 사전처리 - 정규식을 이용해서 파일 확장자 체크
+		var regex = new RegExp("(.*?)\.(exe|sh|zip|alz)$");
+		var maxSize = 5242880;
+		function checkExtension(fileName, fileSize) {
+			if (fileSize >= maxSize) {
+				alert("파일 크기 초과");
+				return false;
+			}
+			if (regex.test(fileName)) {//zip파일 업로드시 (test는 javascript의 if문 문법임)
+				//regex랑 fileName이 일치하면
+				alert("해당 종류의 파일은 업로드 할 수 없음");
+				return false;
+			}
+			return true;
+		}
+		
+		//파일선택 클릭해서 파일 업로드하는게 바뀔때마다 파일업로드
+		$(document).on('change',"input[type='file']", function(e){
+		/* $("input[type='file']").change(function(e) { */
+			var formData = new FormData();
+			var inputFile = $("input[name='uploadFile']");
+			var files = inputFile[0].files;
+
+			//add filedata to formdata
+			for (var i = 0; i < files.length; i++) {
+				if (!checkExtension(files[i].name, files[i].size)) {//파일 확장자 체크
+					return false;
+				}
+				formData.append("uploadFile", files[i]);
+			}
+			
+			$.ajax({
+				url: '/uploadAjaxAction',
+				processData: false, //전달할 데이터를 query string을 만들지 말 것
+				contentType: false,
+				data: formData, //전달할 데이터
+				type : 'POST',
+				dataType : 'json',
+				success: function(result){
+					alert('Uploaded');
+					console.log(result);
+					showUploadedFile(result);//업로드 된 이미지 처리
+					$(".uploadDiv").html(cloneObj.html()); //미리 파일 업로드 전 input을 복사해놓은거를
+					//업로드가 성공적으로 완료되면 다시 html에 보여줌
+
+				}
+			}); //$.ajax
+
+		})
 	});
 </script>
 

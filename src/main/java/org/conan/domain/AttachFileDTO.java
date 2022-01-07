@@ -7,7 +7,7 @@ public class AttachFileDTO {
 	private String fileName;
 	private String uploadPath;
 	private String uuid;
-	private boolean image;
+	private boolean fileType;
 }
 //업로드된 파일의 데이터 반환
 //업로드 이후에 반환해야 하는 정보
