@@ -14,5 +14,11 @@
    <select id="findByBno" resultType="org.conan.domain.BoardAttachVO">
       select * from tbl_attach where bno = #{bno}
    </select>
+   <!-- 오래된파일 삭제하기위함 -->
+   <select id="getOldFiles" resultType="org.conan.domain.BoardAttachVO">
+   	select * from tbl_attach
+   	where uploadpath = date_format(date_sub(now(), interval 1 day),
+   	'%Y\%m\%d');
+   </select>
    
 </mapper>
