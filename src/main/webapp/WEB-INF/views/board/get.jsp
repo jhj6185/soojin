@@ -199,9 +199,24 @@ color: white
 <script type="text/javascript" src="/resources/js/reply.js"></script>
 <!-- 경로는 그냥 절대경로로 해도됨 -->
 <script type="text/javascript">
-	$(document)
-			.ready(
-					function() {
+function showImage(fileCallPath){
+	alert(fileCallPath);
+	//원본 이미지 보여주기(미리보기 사진 클릭시 사진확대)
+	$(".bigPictureWrapper").css("display","flex").show();
+	$(".bigPicture").html("<img src='/display?fileName="+encodeURI(fileCallPath)+"'>")
+	.animate({width: '100%', height: '100%'}, 1000);
+}// <a>태그에서 직접 showImage() 호출할 수 있도록 document ready 외부에 선언
+
+//커진 화면 클릭시 닫히는 기능
+$(".bigPictureWrapper").on("click", function(e){
+	$(".bigPicture").animate({width: '0%', height: '0%'}, 1000);
+	setTimeout(function(){
+		$('.bigPictureWrapper').hide();
+	},1000);
+}) //bigPictureWrapper click
+
+
+	$(document).ready(function() {
 
 						//reply module --> reply.js에서 replyService에 함수를 선언해놓음
 						//그 함수들은 replyService.함수이름 으로 사용가능
