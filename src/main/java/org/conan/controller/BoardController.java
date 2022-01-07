@@ -37,9 +37,14 @@ public class BoardController {
 	@PostMapping("/register")
 	public String register(BoardVO board, RedirectAttributes rttr) {
 		log.info("register : "+ board);
-		service.register(board);
-		rttr.addFlashAttribute("result",board.getBno()); //result로 번호 보내주기
-		return "redirect:/board/list"; //redirect:를 하지 않는 경우, 새로고침시 도배
+		//데이터 수집 여부 확인
+		if(board.getAttachList() !=null) {
+			board.getAttachList().forEach(attach -> log.info(attach));
+		}
+		
+		  service.register(board); rttr.addFlashAttribute("result",board.getBno());
+		  //result로 번호 보내주기
+		 return "redirect:/board/list"; //redirect:를 하지 않는 경우, 새로고침시 도배
 	}
 	/*
 	 * @ModelAttribute : 자동으로 Model 의 데이터를 지정한 이름으로 담아줌.
