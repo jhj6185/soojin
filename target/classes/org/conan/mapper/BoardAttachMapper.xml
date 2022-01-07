@@ -14,7 +14,7 @@
    <select id="findByBno" resultType="org.conan.domain.BoardAttachVO">
       select * from tbl_attach where bno = #{bno}
    </select>
-   <!-- 오래된파일 삭제하기위함 -->
+   <!-- uploadpath가 하루 전 폴더에 들어있는 첨부파일들을 삭제하기위함 -->
    <select id="getOldFiles" resultType="org.conan.domain.BoardAttachVO">
    	select * from tbl_attach
    	where uploadpath = date_format(date_sub(now(), interval 1 day),
