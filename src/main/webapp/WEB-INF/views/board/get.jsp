@@ -466,9 +466,10 @@ $(".bigPictureWrapper").on("click", function(e){
 									
 									var fileCallPath =
 										encodeURIComponent(obj.uploadPath+"/s_"+obj.uuid+"_"+obj.fileName);
-	
+									var originPath = obj.uploadPath+"/"+obj.uuid+"_"+obj.fileName;
+									originPath = originPath.replace(new RegExp(/\\/g),"/");
 									str+="<li data-path='"+obj.uploadPath+"' data-uuid='"+obj.uuid+"' data-filename='"+obj.fileName+"' data-type='"+obj.image+"'><div>";
-									str+="<span>"+obj.fileName+"</span>";
+									str +="<a href=\"javascript:showImage(\'"+originPath+"\')\">";
 									str+="<br><img src='/display?fileName="+fileCallPath+"'>";
 									/* str+="<br><img src='javascript:showImage(\'"+fileCallPath+"'>"; */
 									str+="</div></li>";
