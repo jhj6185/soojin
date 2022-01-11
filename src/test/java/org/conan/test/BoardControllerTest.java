@@ -30,9 +30,9 @@ import lombok.extern.log4j.Log4j;
 public class BoardControllerTest {
 	@Setter(onMethod_ = { @Autowired })
 	private WebApplicationContext ctx;
-	private MockMvc mockMvc;
+	private MockMvc mockMvc; //mockMvc : 가짜 mvc
 
-	@Before
+	@Before //모든 테스트 전에 매번 실행
 	public void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
 	}

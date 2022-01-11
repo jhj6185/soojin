@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.conan.persistence.BoardMapper"> <!-- 인터페이스위치 -->
+<!-- #{} 는 mybatis 문법인데,, jdbc에서 ? 썼던 데에 쓴다고 생각하면 됨 -->
 	<select id="getList" resultType="org.conan.domain.BoardVO">
 		select * from tbl_board where bno>0
 	</select>

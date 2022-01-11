@@ -42,7 +42,7 @@ public class BoardMapperTest {
 		@Test
 		//게시물 조회
 		public void testRead() {
-			BoardVO board = mapper.read(5L);
+			BoardVO board = mapper.read(5L); // 왼쪽이 리턴type , ()안이 xml파일의 ()안에 type이 같아야함
 			log.info(board);
 		}
 		

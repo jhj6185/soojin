@@ -26,7 +26,7 @@ public class BoardServiceTest {
 	@Test
 	public void testExist() {
 		log.info(service);
-		assertNotNull(service);
+		assertNotNull(service); // null인지 아닌지 확인하고 실행하겠다
 	}
 	
 	@Test

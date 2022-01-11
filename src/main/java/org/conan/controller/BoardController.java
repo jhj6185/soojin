@@ -65,7 +65,7 @@ public class BoardController {
 		model.addAttribute("pageMaker", new PageDTO(cri, total));
 
 	}
-	@PostMapping("/register")
+	@PostMapping("/register") //게시글 저장
 	public String register(BoardVO board, RedirectAttributes rttr) {
 		log.info("register : "+ board);
 		//데이터 수집 여부 확인
@@ -85,7 +85,7 @@ public class BoardController {
 	
 	@GetMapping("/register")
 	   public void register() {
-
+		//url로 들어가는 것을 postMapping이 허용하지 않아서 하나 만들어줌
 	   }
 	
 	// 상세보기, 수정화면
