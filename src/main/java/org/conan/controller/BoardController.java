@@ -31,7 +31,8 @@ import lombok.extern.log4j.Log4j;
 @RequestMapping("/board/*")
 @AllArgsConstructor
 public class BoardController {
-	private BoardService service;
+	private BoardService service; //serviceImpl로 가야함, service엔 걍 함수이름만 선언되어있고
+	//기능은 serviceImpl에 있음
 	
 	//서버에 업로드 된 파일들을 삭제하기 위한 메소드
 	private void deleteFiles(List<BoardAttachVO> attachList) {
@@ -67,15 +68,21 @@ public class BoardController {
 	}
 	@PostMapping("/register") //게시글 저장
 	public String register(BoardVO board, RedirectAttributes rttr) {
-		log.info("register : "+ board);
+		log.info("register : "+ board); //board는 게시글을 저장할 때 딱 하나의 
+		// bno,title,content,writer~을 가짐
 		//데이터 수집 여부 확인
 		if(board.getAttachList() !=null) {
 			board.getAttachList().forEach(attach -> log.info("11111"+attach));
 		}
-		  service.register(board); 
-		  rttr.addFlashAttribute("result",board.getBno());
-		  //result로 번호 보내주기
+		  service.register(board); //register가 실행되면 register 안에 있는 selectKey도 실행됨
+		  rttr.addFlashAttribute("result",board.getBno()); //getBno는 BoardVO에서 번호를 가져오는거고
+		  //insertSelectKey의 selectKey는 mysql의 bno값을 가져와서 boardVO에 setting 해 주는것
+		  //그니까 순서상 register 의 selectKey가 boardVO의 bno는 첨에 0일 텐데, 그걸 mysql에서
+		  //가져와서 setting 해주는 것임
+		  //그 후에 그 번호를 가져와주는게 board.getBno()
+		  //그렇게 얻은것을 result로 번호 보내주기
 		 return "redirect:/board/list"; //redirect:를 하지 않는 경우, 새로고침시 도배
+		 //(confirm 하라는 alert창이 계속 뜸)
 	}
 	/*
 	 * @ModelAttribute : 자동으로 Model 의 데이터를 지정한 이름으로 담아줌.
@@ -96,6 +103,10 @@ public class BoardController {
 		{
 			log.info("/get or modify");
 			model.addAttribute("board", service.get(bno));
+			//cri가 뭐냐면 bno를 requestParam으로 받잖아?? 그러면 bno는 bno로 들어가
+			// 근데 bno외에 get 방식으로 오는 정보들은 cri 라는 데에다가 다 받아버리겠다 이거임
+			//그리고 cri를 %{cri.~~~}로 사용할 수도 있게 됨!!
+			// get 이랑 modify페이지에서 el태그 사용 가능한것
 		}
 		
 		// 수정처리

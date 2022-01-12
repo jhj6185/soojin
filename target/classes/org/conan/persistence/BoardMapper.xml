@@ -62,6 +62,8 @@
 	</select>
 
 	<select id="getTotalCount" resultType="int">
+	<!-- resultType이 이상해서 404 error 뜰 수도 있음 ㅠㅠ return타입이 객체면 vo로 해주지만
+	그냥 int형, String형이면 int,String으로 해준다 -->
 		select count(*) from tbl_board
 		<include refid="criteria"></include>
 	</select>

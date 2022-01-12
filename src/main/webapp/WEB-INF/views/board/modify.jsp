@@ -143,6 +143,9 @@
 				formObj.append(amountTag);
 				formObj.append(keywordTag);
 				formObj.append(typeTag);
+				//왜 이렇게 길게 하냐면.. formObj는 post방식인데 우리는 get방식으로 보내고싶어서
+				//post안에 있는 데이터를 싹 비우고 필요한 것만 복사(clone)한 다음에 append해서 보냄
+				//get 방식으로
 			} else if(operation === 'modify'){//게시판 수정 이벤트 처리
 				console.log('submit clicked');
 				var str="";

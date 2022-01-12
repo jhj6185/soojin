@@ -18,6 +18,8 @@ import lombok.extern.log4j.Log4j;
 @RunWith(SpringJUnit4ClassRunner.class)
 
 @ContextConfiguration("file:src/main/webapp/WEB-INF/spring/root-context.xml")
+//root-context.xml을 읽겠다는 뜻 그니까 xml파일에 context:scan 어쩌고로 service가 있어야함
+//근데 mybatis도 여기서 읽으니까 아주아주 잘봐야함
 @Log4j
 public class BoardServiceTest {
 	@Setter(onMethod=@__({@Autowired}))

@@ -11,9 +11,9 @@ public class Criteria {
 	
 	//public Criteria() { this.page = 1; this.perPageNum = 10; }
 	
-	public Criteria() {this(1,10);}
+	public Criteria() {this(1,10);} //기본 생성자
 	
-	public Criteria(int pageNum, int amount) {
+	public Criteria(int pageNum, int amount) { //넣어준 인자로 다시 setting 인듯
 		super();
 		this.pageNum = pageNum; // mySQL에서 limit을 고려함
 		this.amount = amount;
@@ -36,6 +36,7 @@ public class Criteria {
 		this.amount = amount;
 	}
 	public int getPageStart() { //limit 구문에서 시작 위치 지정
+		// -> mySql에서 가져올 index번호의 시작점을 지정해주는 것
 		return (this.pageNum - 1)*this.amount;
 	}
 	public String[] getTypeArr() {

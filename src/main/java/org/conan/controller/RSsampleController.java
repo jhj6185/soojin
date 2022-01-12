@@ -68,10 +68,10 @@ public class RSsampleController {
 		return result;
 	}
 	
-	 @GetMapping("/product/{cat}/{pid}")
+	 @GetMapping("/product/{cat}/{pid}") //product 뒤의 사용자 입력 url은 cat으로, pid로 인식해서
 	   public String[] getPath(@PathVariable("cat") String cat
 	         , @PathVariable("pid") Integer pid) {
-	      return new String[] { "category: " + cat, "productid: " + pid };
+	      return new String[] { "category: " + cat, "productid: " + pid }; //이렇게 item을 만들어준다
 	   }
 	 
 	 @PostMapping("/ticket")

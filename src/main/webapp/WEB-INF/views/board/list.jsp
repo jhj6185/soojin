@@ -162,8 +162,8 @@
 			function() {
 				var result = '<c:out value="${result}"/>';
 				//모달 보여주기
-				checkModal(result);
-				history.replaceState({}, null, null) //오류 잡는거 
+				checkModal(result); //무조건 checkModal이 실행되도록
+				history.replaceState({}, null, null) //오류 잡는거 (현재의 history entry 변경 함수)
 				function checkModal(result) {
 					if (result === '' || history.state) {
 						return;
@@ -177,9 +177,9 @@
 			});
 	$("#regBtn").on("click", function() {
 		self.location = "/board/register";
-	});
+	}); //버튼 클릭시 등록창으로 이동
 
-	var actionForm = $("#actionForm");
+	var actionForm = $("#actionForm"); //page active 파란색으로 되는 부분
 
 	$(".paginate_button a").on("click", function(e) {
 		e.preventDefault(); //전송을 막음
@@ -188,7 +188,8 @@
 		actionForm.submit();
 	});
 
-	$(".move").on("click",function(e) {
+	$(".move").on("click",function(e) { //page detailview로 클릭할 때 bno와 page number
+		//같은거 다 가져가게 하는거
 				e.preventDefault();
 				actionForm.append("<input type='hidden' name='bno' value='"
 						+ $(this).attr("href") + "'>");
