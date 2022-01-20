@@ -43,6 +43,17 @@
            <filter-name>encoding</filter-name>
            <servlet-name>appServlet</servlet-name>
      </filter-mapping>
+     <!-- spring security web 설정 -->
+     <filter-mapping>
+           <filter-name>springSecurityFilterChain</filter-name>
+           <servlet-name>org.springframework.web.filter.DelegatingFilterProxy</servlet-name>
+     </filter-mapping>
+     <filter-mapping>
+           <filter-name>springSecurityFilterChain</filter-name>
+           <servlet-name>/*</servlet-name>
+     </filter-mapping>
+     
+     
      
     <!--  <multipart-config>
      <location>C:\\upload</location>
