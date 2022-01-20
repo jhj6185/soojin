@@ -64,7 +64,6 @@ public class BoardController {
 		int total = service.getTotal(cri);
 		log.info("total: " + total);
 		model.addAttribute("pageMaker", new PageDTO(cri, total));
-
 	}
 	@PostMapping("/register") //게시글 저장
 	public String register(BoardVO board, RedirectAttributes rttr) {
